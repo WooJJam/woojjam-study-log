@@ -150,11 +150,28 @@ static {
 
 다음 사진과 같은 출력 결과를 확인할 수 있다.
 
-#### 2. 멀티클래스 구조에서 클래스 로딩 순서
+### 2. static 필드 초기화와 lazy loading의 관계
 
+> 📌 Lazy Loading: 리소스, 클래스, 객체 등을 사용될 때까지 생성하지 않고 미뤄두는 전략 
 
+static 초기화는 기본적으로 `Eager(즉시 초기화)` 이다.
 
-3. static 필드 초기화와 lazy loading의 관계
+```java
+class Singleton {
+    private Singleton() {}
+
+    private static class Holder {
+        static final Singleton INSTANCE = new Singleton();
+    }
+
+    public static Singleton getInstance() {
+        return Holder.INSTANCE;
+    }
+}
+```
+
+- `Holder` 클래스는 `getInstance()` 가 호출될 때 까지 로딩되지 않음
+- JVM의 클래스 로더가 런타임 시점에 해당 클래스를 로딩할 지 결정함
 
 ## 📢 꼬리 질문
 
