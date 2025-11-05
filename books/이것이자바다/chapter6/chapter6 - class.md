@@ -234,7 +234,7 @@ static final double EARTH_SURFACE_AREA = 5.1471E8
 
 그리고 `final` 필드는 초기화 후 최종적인 값을 가지므로 수정할 수 없다. 그러니 "불변성을 보장하는것이 아닐까?" 라는 의문이 들기 쉽다. 나도 그랬다.
 
-결론부터 말하자면 `final` 필드라고 불변을 보장하지 않는다. 
+결론부터 말하자면 `final`은 완전히 불변을 보장하지 않는다. 
 
 #### 📌 `final` 은 **객체 참조 변경 금지** 이지, *내용 변경 금지* 가 아니다!
 
@@ -307,7 +307,7 @@ public class Car {
 
 값을 변경하는 메소드를 삭제하고, 생성자를 통해서 객체 초기화 시점에 값을 할당하는 방법으로 불변성을 보장할 수 있다.
 
-### 2. 컬렉션의 경우 `Unmodifiable Collection` 을 사용한다.
+#### 2. 컬렉션의 경우 `Unmodifiable Collection` 을 사용한다.
 
 ```java
 public class Game {
@@ -323,4 +323,6 @@ public class Game {
 
 하지만.. `unmodifiable` 컬렉션을 이용하더라도 원본 레퍼런스 자체를 가지고 있다면 수정이 가능해지므로 저것만으로는 완벽한 불변을 보장할 수는 없다고 한다. 
 
-추가적인 내용은 본래 "`final` 은 불변을 보장할까?" 와 너무 달라지는 것 같아 여기서 정리하고 추후에 다루어 다시 정리해보겠다.
+#### 3. `List.of` 를 사용한다.
+
+`List.of` 는 Java 9부터 도입된 불변 리스트를 생성하는 메서드이다. `List.of` 를 통해 생성된 리스트는 `add`, `set`, `remove` 에 대해서 모두 `UnsupportedOerationException` 을 발생시킨다.
