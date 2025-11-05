@@ -173,6 +173,154 @@ class Singleton {
 - `Holder` 클래스는 `getInstance()` 가 호출될 때 까지 로딩되지 않음
 - JVM의 클래스 로더가 런타임 시점에 해당 클래스를 로딩할 지 결정함
 
+## 6.11 final 필드와 상수
+
+`final` 은 '최종적' 이라는 의미를 가지고 있다. 자바에서 '최종적' 이라는 말의 의미는 초기값이 한번 저장되면 프로그램 실행 도중에 수정할 수 없게 된다는 말이다. 
+
+또한 `final` 은 클래스, 메서드, 필드에 각각 붙일 수 있다.
+
+#### 1. `final` 클래스는 상속할 수 없다.
+
+```java
+public final class Car { } // final 클래스는 상속할 수 없다!
+
+public class Bus extends Car { }
+```
+
+`final` 클래스는 최종적인 클래스이므로 상속을 할 수 없다.
+
+#### 2. `final` 메소드는 오버라이딩 할 수 없다.
+
+```java
+public class Animal {
+    public final void bark() {
+        System.out.println("짖다.");
+    }
+}
+
+public class Dog extends Animal {
+	
+    @Override
+    public void bark(){
+        System.out.println("멍멍"); // ERROR!
+    }
+}
+```
+
+`final` 메소드는 최종적인 메소드이므로 오버라이딩을 통한 재정의도 불가능 하다.
+
+### 상수
+
+상수란 불변적인 값을 의미한다. 원주율 파이 나 지구의 둘레 등고 같은 값이 해당된다.
+
+이러한 상수는 `static final` 을 통해 지정할 수 있다. 객체마다 저장할 필요가 없고, 여러개의 값을 가져도 안되므로 `static` 이면서 `final` 이다.
+
+```java
+static final double PI = 3.14159;
+static final double EARTH_SURFACE_AREA = 5.1471E8
+```
+
+관례적으로 상수는 모두 대문자로 표현하고, 서로 다른 단어가 혼합될 경우 언더바(_) 를 이용한다.
+
+
+
 ## 📢 꼬리 질문
 
-static 필드가 여러 스레드에 의해 동시에 수정될 가능성이 있을 때, 어떤 문제가 생길 수 있으며, 이를 방지하기 위한 기법이 있을까?
+1. static 필드가 여러 스레드에 의해 동시에 수정될 가능성이 있을 때, 어떤 문제가 생길 수 있으며, 이를 방지하기 위한 기법이 있을까?
+
+### 2. final 필드는 불변일까?
+
+`final` 필드가 공용성을 가지지는 않기에 상수가 아니란 것은 알고 있다. 
+
+그리고 `final` 필드는 초기화 후 최종적인 값을 가지므로 수정할 수 없다. 그러니 "불변성을 보장하는것이 아닐까?" 라는 의문이 들기 쉽다. 나도 그랬다.
+
+결론부터 말하자면 `final` 필드라고 불변을 보장하지 않는다. 
+
+#### 📌 `final` 은 **객체 참조 변경 금지** 이지, *내용 변경 금지* 가 아니다!
+
+물론 **primitive 타입의 필드** 라면 블뱐성을 보장한다고 할 수 있다.
+
+```java
+public class FinalExample {
+	
+	private final int num = 3;
+	
+	// ERROR: Cannot assign a value to final variable 'num'
+	private void changeNum(int newNum) {
+		this.num = newNum;
+	}
+}
+```
+
+`primitive` 타입의 같은 경우 힙 영역에 저장된 리터럴 값을 참조하고 있기 때문에, 다른 값으로 변경하려고 한다면 다른 값을 참조한다는 의미와 마찬가지이므로 변경이 불가능하여 불변성을 보장한다고 볼 수 있다.
+
+하지만 `Reference` 타입의 객체는 `List` 와 같은 컬렉션이라면 이야기가 달라진다.
+
+```java
+static class Car {
+	private int curPosition = 3;
+
+	public void changePosition(int newPosition) {
+		curPosition = newPosition;
+	}
+}
+
+public static void main(String[] args) {
+
+	final Car car = new Car();
+
+	car.changePosition(10);
+	System.out.println("변경 완료");
+}
+```
+
+Car 객체를 정의하고 main 메소드에서 Car 객체를 `final` 로 지정하였다. 그리고 이때 `changePosition()` 메소드를 통해 Car 객체의 내부 값을 변경하면 문제없이 변경되는 걸 확인할 수 있다.
+
+car 이라는 참조가 다른 객체를 가리키지 못하게 할 뿐이지 객체 내부의 데이터는 얼마든지 변경될 수 있음을 의미한다.
+
+이는 `List` 에서도 마찬가지이다.
+
+```java
+final List<String> list = new ArrayList<>();
+list.add("hello");   // ✅ 가능
+list = new ArrayList<>(); // ❌ 에러
+```
+
+`final` 로 지정한 list 라는 객체는 외부에서 내부 데이터를 변경할 수 있다.
+
+따라서, `final` 은 불변성을 보장하지는 않는다는 것을 확인할 수 있다.
+
+### 불변을 보장할려면?
+
+#### 1. 생성자를 통해서 값을 주입받는다.
+
+```java
+public class Car {
+    private final int curPosition;
+
+    public Car(int curPosition) {
+			this.curPosition = curPosition
+		}
+
+}
+```
+
+값을 변경하는 메소드를 삭제하고, 생성자를 통해서 객체 초기화 시점에 값을 할당하는 방법으로 불변성을 보장할 수 있다.
+
+### 2. 컬렉션의 경우 `Unmodifiable Collection` 을 사용한다.
+
+```java
+public class Game {
+    private final List<String> playerNames = new ArrayList<>();
+
+    public List<String> getPlayerNames() {
+        return Collctions.unmodifiableList(playerNames);
+    }
+}
+```
+
+`unmodifiable` 컬렉션은 해당 컬렉션을 read-only 로 강제하는 컬렉션으로 새로운 값을 추가하면 에러가 발생한다.
+
+하지만.. `unmodifiable` 컬렉션을 이용하더라도 원본 레퍼런스 자체를 가지고 있다면 수정이 가능해지므로 저것만으로는 완벽한 불변을 보장할 수는 없다고 한다. 
+
+추가적인 내용은 본래 "`final` 은 불변을 보장할까?" 와 너무 달라지는 것 같아 여기서 정리하고 추후에 다루어 다시 정리해보겠다.
