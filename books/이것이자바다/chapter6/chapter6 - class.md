@@ -230,6 +230,12 @@ static final double EARTH_SURFACE_AREA = 5.1471E8
 
 ### 📌 2. final 필드는 불변일까?
 
+해당 내용은 [우쨈 블로그 - Java의 final은 불변성을 보장하지 않는다.
+](https://woojjam.tistory.com/14)에 게시되었습니다.
+
+<details>
+<summary>첫 정리글</summary>
+
 `final` 필드가 공용성을 가지지는 않기에 상수가 아니란 것은 알고 있다. 
 
 그리고 `final` 필드는 초기화 후 최종적인 값을 가지므로 수정할 수 없다. 그러니 "불변성을 보장하는것이 아닐까?" 라는 의문이 들기 쉽다. 나도 그랬다.
@@ -326,3 +332,6 @@ public class Game {
 #### 📌 3. `List.of` 를 사용한다.
 
 `List.of` 는 Java 9부터 도입된 불변 리스트를 생성하는 메서드이다. `List.of` 를 통해 생성된 리스트는 `add`, `set`, `remove` 에 대해서 모두 `UnsupportedOerationException` 을 발생시킨다.
+
+
+</details>
